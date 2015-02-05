@@ -136,56 +136,56 @@ void Init_spline_ext(Rice::Module& base_m)
 {
     typedef std::vector<double>(RubySpline::*SimplifySelector)(double);
     typedef void(SplineBase::*Append)(SplineBase const&,double);
+    typedef double (SplineBase::*GetCurveLength)(double) const;
 
     coordinate_type_type =
-	define_enum<CoordinateType>("CoordinateType", base_m)
-	.define_value("ORDINARY_POINT", SplineBase::ORDINARY_POINT)
-	.define_value("KNUCKLE_POINT", SplineBase::KNUCKLE_POINT)
-	.define_value("DERIVATIVE_TO_NEXT", SplineBase::DERIVATIVE_TO_NEXT)
-	.define_value("DERIVATIVE_TO_PRIOR", SplineBase::DERIVATIVE_TO_PRIOR)
-	.define_value("SECOND_DERIVATIVE_TO_NEXT", SplineBase::SECOND_DERIVATIVE_TO_NEXT)
-	.define_value("SECOND_DERIVATIVE_TO_PRIOR", SplineBase::SECOND_DERIVATIVE_TO_PRIOR)
-	.define_value("TANGENT_POINT_FOR_NEXT", SplineBase::TANGENT_POINT_FOR_NEXT)
-	.define_value("TANGENT_POINT_FOR_PRIOR", SplineBase::TANGENT_POINT_FOR_PRIOR);
+        define_enum<CoordinateType>("CoordinateType", base_m)
+        .define_value("ORDINARY_POINT", SplineBase::ORDINARY_POINT)
+        .define_value("KNUCKLE_POINT", SplineBase::KNUCKLE_POINT)
+        .define_value("DERIVATIVE_TO_NEXT", SplineBase::DERIVATIVE_TO_NEXT)
+        .define_value("DERIVATIVE_TO_PRIOR", SplineBase::DERIVATIVE_TO_PRIOR)
+        .define_value("SECOND_DERIVATIVE_TO_NEXT", SplineBase::SECOND_DERIVATIVE_TO_NEXT)
+        .define_value("SECOND_DERIVATIVE_TO_PRIOR", SplineBase::SECOND_DERIVATIVE_TO_PRIOR)
+        .define_value("TANGENT_POINT_FOR_NEXT", SplineBase::TANGENT_POINT_FOR_NEXT)
+        .define_value("TANGENT_POINT_FOR_PRIOR", SplineBase::TANGENT_POINT_FOR_PRIOR);
 
     Data_Type<SplineBase> rb_SplineBase = define_class_under<SplineBase>(base_m, "SplineBase")
-        .define_constructor(Constructor<SplineBase,int,double,int>(),
-                (Arg("dimension"), Arg("geometric_resolution") = 0.1, Arg("order") = 3))
-        .define_method("geometric_resolution=", &SplineBase::setGeometricResolution)
-        .define_method("geometric_resolution", &SplineBase::getGeometricResolution)
-        .define_method("order", &SplineBase::getCurveOrder)
-        .define_method("empty?", &SplineBase::isEmpty)
-        .define_method("singleton?", &SplineBase::isSingleton)
-        .define_method("reverse", &SplineBase::reverse)
-        .define_method("dimension", &SplineBase::getDimension)
-        .define_method("point_count", &SplineBase::getPointCount)
-        .define_method("curve_length", &SplineBase::getCurveLength)
-        .define_method("curvature_max", &SplineBase::getCurvatureMax)
-        .define_method("start_param", &SplineBase::getStartParam)
-        .define_method("end_param", &SplineBase::getEndParam)
-        .define_method("unit_parameter", &SplineBase::getUnitParameter)
-        .define_method("curvature_at", &SplineBase::getCurvature)
-        .define_method("variation_of_curvature_at", &SplineBase::getVariationOfCurvature)
-        .define_method("simplify", static_cast<SimplifySelector>(&SplineBase::simplify))
-        .define_method("clear", &SplineBase::clear)
-        .define_method("sisl_curve_type", &SplineBase::getSISLCurveType)
-        .define_method("coordinate_stride", &SplineBase::getCoordinatesStride)
-        .define_method("join", &SplineBase::join, (Arg("curve"), Arg("tolerance") = static_cast<double>(0), Arg("with_tangents") = true))
-        .define_method("do_split", &SplineBase::split)
-        .define_method("append", static_cast<Append>(&SplineBase::append),
-                (Arg("spline"), Arg("tolerance") = static_cast<double>(1e-6)));
+                                          .define_constructor(Constructor<SplineBase,int,double,int>(),
+                                                  (Arg("dimension"), Arg("geometric_resolution") = 0.1, Arg("order") = 3))
+                                          .define_method("geometric_resolution=", &SplineBase::setGeometricResolution)
+                                          .define_method("geometric_resolution", &SplineBase::getGeometricResolution)
+                                          .define_method("order", &SplineBase::getCurveOrder)
+                                          .define_method("empty?", &SplineBase::isEmpty)
+                                          .define_method("singleton?", &SplineBase::isSingleton)
+                                          .define_method("reverse", &SplineBase::reverse)
+                                          .define_method("dimension", &SplineBase::getDimension)
+                                          .define_method("point_count", &SplineBase::getPointCount)
+                                          .define_method("curve_length", static_cast<GetCurveLength>(&SplineBase::getCurveLength))
+                                          .define_method("curvature_max", &SplineBase::getCurvatureMax)
+                                          .define_method("start_param", &SplineBase::getStartParam)
+                                          .define_method("end_param", &SplineBase::getEndParam)
+                                          .define_method("curvature_at", &SplineBase::getCurvature)
+                                          .define_method("variation_of_curvature_at", &SplineBase::getVariationOfCurvature)
+                                          .define_method("simplify", static_cast<SimplifySelector>(&SplineBase::simplify))
+                                          .define_method("clear", &SplineBase::clear)
+                                          .define_method("sisl_curve_type", &SplineBase::getSISLCurveType)
+                                          .define_method("coordinate_stride", &SplineBase::getCoordinatesStride)
+                                          .define_method("join", &SplineBase::join, (Arg("curve"), Arg("tolerance") = static_cast<double>(0), Arg("with_tangents") = true))
+                                          .define_method("do_split", &SplineBase::split)
+                                          .define_method("append", static_cast<Append>(&SplineBase::append),
+                                                  (Arg("spline"), Arg("tolerance") = static_cast<double>(1e-6)));
 
     Data_Type<RubySpline> rb_Spline = define_class_under<RubySpline, SplineBase>(base_m, "Spline")
-        .define_constructor(Constructor<RubySpline,int,double,int>(),
-                (Arg("dimension"), Arg("geometric_resolution") = 0.1, Arg("order") = 3))
-        .define_method("initialize_copy", &RubySpline::initialize_copy)
-        .define_method("do_interpolate", &RubySpline::do_interpolate)
-        .define_method("coordinates", &RubySpline::do_coordinates)
-        .define_method("knots", &RubySpline::do_knots)
-        .define_method("do_length", &RubySpline::do_length)
-        .define_method("do_find_one_closest_point", &RubySpline::do_findOneClosestPoint)
-        .define_method("do_find_closest_points", &RubySpline::do_findClosestPoints)
-        .define_method("reset", &RubySpline::do_reset, (Arg("coordinates"), Arg("knots"), Arg("kind") = -1))
-        .define_method("get", &RubySpline::do_getPoint, (Arg("parameter"), Arg("with_tangent") = false));
+                                      .define_constructor(Constructor<RubySpline,int,double,int>(),
+                                              (Arg("dimension"), Arg("geometric_resolution") = 0.1, Arg("order") = 3))
+                                      .define_method("initialize_copy", &RubySpline::initialize_copy)
+                                      .define_method("do_interpolate", &RubySpline::do_interpolate)
+                                      .define_method("coordinates", &RubySpline::do_coordinates)
+                                      .define_method("knots", &RubySpline::do_knots)
+                                      .define_method("do_length", &RubySpline::do_length)
+                                      .define_method("do_find_one_closest_point", &RubySpline::do_findOneClosestPoint)
+                                      .define_method("do_find_closest_points", &RubySpline::do_findClosestPoints)
+                                      .define_method("reset", &RubySpline::do_reset, (Arg("coordinates"), Arg("knots"), Arg("kind") = -1))
+                                      .define_method("get", &RubySpline::do_getPoint, (Arg("parameter"), Arg("with_tangent") = false));
 }
 
