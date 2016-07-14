@@ -38,21 +38,6 @@ namespace base
     // alias for backward compatibility
     typedef Affine3d					   Transform3d;
 
-    /**
-     * @brief Check if NaN values
-     */
-    template<typename _Derived>
-    static inline bool isnotnan(const Eigen::MatrixBase<_Derived>& x)
-    {
-        return ((x.array() == x.array())).all();
-    };
-
-    template<typename _Derived>
-    static inline bool isfinite(const Eigen::MatrixBase<_Derived>& x)
-    {
-        return isnotnan(x - x);
-    };
-
     // Guarantee Semi-Positive Definite (SPD) matrix.
     template <typename _MatrixType>
     static _MatrixType guaranteeSPD (const _MatrixType &A)
